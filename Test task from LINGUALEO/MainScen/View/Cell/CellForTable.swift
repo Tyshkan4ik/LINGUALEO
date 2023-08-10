@@ -15,6 +15,16 @@ class CellForTable: UITableViewCell {
     
     //MARK: - Properties
     
+    private let cellFrame: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBlue
+        view.alpha = 0.95
+        
+        view.layer.cornerRadius = 18
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let name: UILabel = {
         let label = UILabel()
         label.font = UIFont.boldSystemFont(ofSize: 20)
@@ -35,7 +45,7 @@ class CellForTable: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupSubview()
         setupConstraints()
-        //backgroundColor = .clear
+        backgroundColor = .clear
         selectionStyle = .none
     }
     
@@ -46,24 +56,31 @@ class CellForTable: UITableViewCell {
     //MARK: - Methods
     
     private func setupSubview() {
-        contentView.addSubview(name)
-        contentView.addSubview(score)
+        contentView.addSubview(cellFrame)
+        cellFrame.addSubview(name)
+        cellFrame.addSubview(score)
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            name.topAnchor.constraint(equalTo: topAnchor, constant: 20),
-            name.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            
+            cellFrame.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+            cellFrame.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            cellFrame.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            cellFrame.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            
+            name.topAnchor.constraint(equalTo: cellFrame.topAnchor, constant: 20),
+            name.leadingAnchor.constraint(equalTo: cellFrame.leadingAnchor, constant: 20),
             name.trailingAnchor.constraint(equalTo: score.leadingAnchor, constant: -20),
-            name.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -20),
+            name.bottomAnchor.constraint(equalTo: cellFrame.bottomAnchor, constant: -20),
             
             score.centerYAnchor.constraint(equalTo: name.centerYAnchor),
-            score.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20)
+            score.trailingAnchor.constraint(equalTo: cellFrame.trailingAnchor, constant: -20)
         ])
     }
     
-    func setup(model: String) {
-        name.text = model
-        score.text = model
+    func setup(model: PlayersModel) {
+        name.text = model.name
+        score.text = String(model.score)
     }
 }

@@ -10,7 +10,7 @@ import Foundation
 struct PlayersModel {
     let country: String
     let name: String
-    let age: String
-    let level: String
-    let score: String
+    let age: Int
+    let level: Int
+    let score: Int
 }
