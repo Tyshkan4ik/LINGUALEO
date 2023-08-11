@@ -75,7 +75,9 @@
 			isa = PBXGroup;
 			children = (
 				81C511DD2A84DF2200AB3BBD /* App */,
-				81C511DC2A84DF1100AB3BBD /* MainScen */,
+				81C511DF2A84E8C200AB3BBD /* Model */,
+				81C511DE2A84DF3200AB3BBD /* View */,
+				81C511E02A84E98900AB3BBD /* ViewModel */,
 				81C511E82A850B7900AB3BBD /* NetworkService */,
 				81C511E52A85075900AB3BBD /* Resources */,
 				81C511D12A84DCCB00AB3BBD /* Assets.xcassets */,
@@ -83,16 +85,6 @@
 				81C511D62A84DCCB00AB3BBD /* Info.plist */,
 			);
 			path = "Test task from LINGUALEO";
-			sourceTree = "<group>";
-		};
-		81C511DC2A84DF1100AB3BBD /* MainScen */ = {
-			isa = PBXGroup;
-			children = (
-				81C511DF2A84E8C200AB3BBD /* Model */,
-				81C511DE2A84DF3200AB3BBD /* View */,
-				81C511E02A84E98900AB3BBD /* ViewModel */,
-			);
-			path = MainScen;
 			sourceTree = "<group>";
 		};
 		81C511DD2A84DF2200AB3BBD /* App */ = {
