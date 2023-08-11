@@ -18,5 +18,3 @@ struct MainModel {
         let score: Int
     }
 }
-
-
