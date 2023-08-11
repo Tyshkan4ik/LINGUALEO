@@ -17,9 +17,7 @@ class ViewForSectionTable: UITableViewHeaderFooterView {
     
     private let sectionFrame: UIView = {
         let view = UIView()
-        //view.backgroundColor = .systemBlue
         view.alpha = 0.95
-        
         view.layer.cornerRadius = 18
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
@@ -27,7 +25,6 @@ class ViewForSectionTable: UITableViewHeaderFooterView {
     
     private let country: UILabel = {
         let label = UILabel()
-        label.text = "HELLO"
         label.textColor = .black
         label.font = UIFont.boldSystemFont(ofSize: 30)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -41,8 +38,6 @@ class ViewForSectionTable: UITableViewHeaderFooterView {
         super.init(reuseIdentifier: reuseIdentifier)
         setupSubview()
         setupConstraints()
-        //backgroundColor = .clear
-        
     }
     
     required init?(coder: NSCoder) {
@@ -74,4 +69,3 @@ class ViewForSectionTable: UITableViewHeaderFooterView {
         country.text = model
     }
 }
-

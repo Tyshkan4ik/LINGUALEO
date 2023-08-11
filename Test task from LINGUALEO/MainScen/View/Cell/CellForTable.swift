@@ -19,7 +19,6 @@ class CellForTable: UITableViewCell {
         let view = UIView()
         view.backgroundColor = .systemBlue
         view.alpha = 0.95
-        
         view.layer.cornerRadius = 18
         view.translatesAutoresizingMaskIntoConstraints = false
         return view

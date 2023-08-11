@@ -11,7 +11,7 @@ class MainViewController: UIViewController {
     
     //MARK: - Properties
     
-    var dataModel = [MainModel]()
+    private var dataModel = [MainModel]()
     
     private let backgroundImage: UIImageView = {
         let image = UIImage(named: "MainLinguaLeo")
@@ -132,8 +132,23 @@ extension MainViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let detailViewModel = DetailedViewModel(playersModel: MainModel(cuntry: dataModel[indexPath.section].cuntry, players: [dataModel[indexPath.section].players[indexPath.row]]))
+        let detailViewModel = DetailedViewModel(playersModel: MainModel(cuntry: dataModel[indexPath.section].cuntry, players: [dataModel[indexPath.section].players[indexPath.row]]), section: indexPath.section, index: indexPath.row)
         let controller = DetailedInformationViewController(detailedViewModel: detailViewModel)
+        
+        controller.completionDelete = { [weak self] section, index in
+            self?.dataModel[section].players.remove(at: index)
+            self?.table.reloadData()
+            
+            guard let isEmpty = self?.dataModel[section].players.isEmpty else {
+                return
+            }
+            
+            if isEmpty  {
+                self?.dataModel.remove(at: section)
+                self?.table.reloadData()
+            }
+        }
+        
         navigationController?.pushViewController(controller, animated: true)
     }
 }

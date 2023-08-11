@@ -16,16 +16,19 @@ protocol MainViewModelProtocol {
 
 class MainViewModel: MainViewModelProtocol {
     
+    //MARK: - Properties
+
+    var updatePlayersModel: (([MainModel]) -> ())?
+    
+    private var networkService = NetworkService()
+    
+    var setupInitial: (() -> Void)?
+    
+    //MARK: - Methods
+    
     func viewDidLoad() {
         setupInitial?()
     }
-
-    
-    var updatePlayersModel: (([MainModel]) -> ())?
-    
-    var networkService = NetworkService()
-    
-    var setupInitial: (() -> Void)?
     
     func getPlayersData() {
         networkService.getPlayers { [weak self] result in

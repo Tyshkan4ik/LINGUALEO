@@ -9,7 +9,7 @@ import Foundation
 
 struct MainModel {
     let cuntry: String
-    let players: [Player]
+    var players: [Player]
     
     struct Player {
         let name: String

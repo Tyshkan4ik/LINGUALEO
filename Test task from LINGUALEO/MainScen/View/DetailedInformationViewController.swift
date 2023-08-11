@@ -11,25 +11,15 @@ class DetailedInformationViewController: UIViewController {
     
     //MARK: - Properties
     
-    var test = "test"
+    private var detailedViewModel: DetailedViewModelProtocol?
     
-    var detailedViewModel: DetailedViewModelProtocol?
-//        didSet {
-//            detailedViewModel?.updatePlayersModel = { [weak self] player in
-//                self?.test = player?.name ?? "gog"
-//                print(self?.test)
-//                self?.view.setNeedsLayout()
-//            }
-//        }
+    var completionDelete: ((_ section: Int, _ index: Int) -> Void)?
     
-    
-    
-    var detailedPlayer: MainModel?
+    private var detailedPlayer: MainModel?
     
     private let backgroundImage: UIImageView = {
         let image = UIImage(named: "linguaLeo2")
         let imageView = UIImageView(image: image)
-        //imageView.alpha = 0.8
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -38,15 +28,12 @@ class DetailedInformationViewController: UIViewController {
         let view = UIView()
         view.backgroundColor = .white
         view.alpha = 0.8
-        
-        view.layer.cornerRadius = 18
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
     private let name: UILabel = {
         let label = UILabel()
-        //label.text = "Имя: Стасик"
         label.numberOfLines = 2
         label.textColor = .black
         label.font = UIFont.boldSystemFont(ofSize: 27)
@@ -56,7 +43,6 @@ class DetailedInformationViewController: UIViewController {
     
     private let age: UILabel = {
         let label = UILabel()
-        label.text = "Возраст: 30 лет"
         label.textColor = .black
         label.font = UIFont.boldSystemFont(ofSize: 27)
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -65,7 +51,6 @@ class DetailedInformationViewController: UIViewController {
     
     private let country: UILabel = {
         let label = UILabel()
-        label.text = "Город: Санкт-Петербург"
         label.numberOfLines = 2
         label.textColor = .black
         label.font = UIFont.boldSystemFont(ofSize: 27)
@@ -75,7 +60,6 @@ class DetailedInformationViewController: UIViewController {
     
     private let lavel: UILabel = {
         let label = UILabel()
-        label.text = "Уровень: 99"
         label.numberOfLines = 0
         label.textColor = .black
         label.font = UIFont.boldSystemFont(ofSize: 27)
@@ -85,7 +69,6 @@ class DetailedInformationViewController: UIViewController {
     
     private let score: UILabel = {
         let label = UILabel()
-        label.text = "Счет: 9999"
         label.numberOfLines = 0
         label.textColor = .black
         label.font = UIFont.boldSystemFont(ofSize: 27)
@@ -93,7 +76,7 @@ class DetailedInformationViewController: UIViewController {
         return label
     }()
     
-    lazy var buttonDelete: UIButton = {
+    private lazy var buttonDelete: UIButton = {
         let button = UIButton()
         button.setTitle("Удалить пользователя", for: .normal)
         button.setTitleColor(.white, for: .normal)
@@ -101,6 +84,7 @@ class DetailedInformationViewController: UIViewController {
         button.layer.borderWidth = 3
         button.layer.borderColor = UIColor.black.cgColor
         button.layer.cornerRadius = 10
+        button.addTarget(self, action: #selector(deletePeople), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
@@ -132,10 +116,9 @@ class DetailedInformationViewController: UIViewController {
         bindingViewModel()
         detailedViewModel?.viewDidLoad()
         
-        //updateView()
     }
     
-    func bindingViewModel() {
+    private func bindingViewModel() {
         detailedViewModel?.updatePlayersModel = { [weak self] model in
             self?.name.text = "Имя: \(model.players.first?.name ?? "")"
             self?.age.text = "Возраст: \(model.players.first?.age ?? 0)"
@@ -143,8 +126,6 @@ class DetailedInformationViewController: UIViewController {
             self?.lavel.text = "Уровень: \(model.players.first?.level ?? 0)"
             self?.score.text = "Счет: \(model.players.first?.score ?? 0)"
         }
-        
-    
     }
     
     private func setupElements() {
@@ -180,7 +161,6 @@ class DetailedInformationViewController: UIViewController {
             country.topAnchor.constraint(equalTo: age.bottomAnchor, constant: 20),
             country.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
             
-            
             buttonDelete.bottomAnchor.constraint(equalTo: backgroundImage.safeAreaLayoutGuide.bottomAnchor),
             buttonDelete.leadingAnchor.constraint(equalTo: backgroundImage.leadingAnchor, constant: 50),
             buttonDelete.trailingAnchor.constraint(equalTo: backgroundImage.trailingAnchor, constant: -50),
@@ -194,5 +174,18 @@ class DetailedInformationViewController: UIViewController {
         ])
     }
     
-    
+    @objc
+    private func deletePeople() {
+        var sectionsDelete: Int = 0
+        var indexDelete: Int = 0
+        detailedViewModel?.delete = { section, index in
+            sectionsDelete = section
+            indexDelete = index
+        }
+        detailedViewModel?.deletePeople()
+        
+        completionDelete?(sectionsDelete, indexDelete)
+        
+        navigationController?.popViewController(animated: true)
+    }
 }
