@@ -11,7 +11,7 @@ class MainViewController: UIViewController {
     
     //MARK: - Properties
     
-    var playersDictionary = [String: [PlayersModel]]()
+    var dataModel = [MainModel]()
     
     private let backgroundImage: UIImageView = {
         let image = UIImage(named: "MainLinguaLeo")
@@ -22,44 +22,58 @@ class MainViewController: UIViewController {
     }()
     
     private lazy var table: UITableView = {
-       let table = UITableView()
+        let table = UITableView()
         table.backgroundColor = .clear
         table.alpha = 0.9
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
     
-    var mainViewModel: MainViewModelProtocol? {
-        didSet {
-            mainViewModel?.updatePlayersModel = { [weak self] dictionary in
-                self?.playersDictionary = dictionary
-                self?.table.reloadData()
-            }
-        }
-    }
+    private var viewModel: MainViewModelProtocol
     
     //MARK: - Methods
+    
+    init(viewModel: MainViewModelProtocol) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+        
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        setupElements()
-        setupConstraints()
-        setupTable()
+        bindingViewModel()
         
-        mainViewModel = MainViewModel()
-        mainViewModel?.getPlayersData()
+        viewModel.getPlayersData()
+        viewModel.viewDidLoad()
+    }
+    
+    private func bindingViewModel() {
+        viewModel.setupInitial = { [weak self] in
+            self?.setupElements()
+            self?.setupConstraints()
+            self?.setupTable()
+        }
         
+        viewModel.updatePlayersModel = { [weak self] model in
+            self?.dataModel = model
+            self?.table.reloadData()
+        }
     }
     
     private func setupElements() {
         view.addSubview(backgroundImage)
         view.addSubview(table)
+        
     }
     
     private func setupConstraints() {
@@ -90,13 +104,11 @@ class MainViewController: UIViewController {
 extension MainViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        playersDictionary.count
+        dataModel.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let keys: [String] = Array(playersDictionary.keys)
-        let key = keys[section]
-        return playersDictionary[key]?.count ?? 0
+        dataModel[section].players.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -104,32 +116,24 @@ extension MainViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
-        let keys: [String] = Array(playersDictionary.keys)
-        let key = keys[indexPath.section]
-        
-        guard let playersArray = playersDictionary[key] else {
-            return UITableViewCell()
-        }
-        
-        cell.setup(model: playersArray[indexPath.row])
+        let model = dataModel[indexPath.section].players[indexPath.row]
+        cell.setup(model: model)
         return cell
     }
 }
 
 extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        guard let reuseSection = tableView.dequeueReusableHeaderFooterView(withIdentifier: ViewForSectionTable.identifier) as? ViewForSectionTable else {
-            return UITableViewHeaderFooterView()
-        }
-        let keys: [String] = Array(playersDictionary.keys)
-       let key = keys[section]
+        let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: ViewForSectionTable.identifier) as? ViewForSectionTable
+        let model = dataModel[section]
         
-        reuseSection.setup(model: key)
-               return reuseSection
+        view?.setup(model: model.cuntry)
+        return view
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let controller = DetailedInformationViewController()
+        let detailViewModel = DetailedViewModel(playersModel: MainModel(cuntry: dataModel[indexPath.section].cuntry, players: [dataModel[indexPath.section].players[indexPath.row]]))
+        let controller = DetailedInformationViewController(detailedViewModel: detailViewModel)
         navigationController?.pushViewController(controller, animated: true)
     }
 }

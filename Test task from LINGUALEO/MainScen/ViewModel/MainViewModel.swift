@@ -8,54 +8,48 @@
 import Foundation
 
 protocol MainViewModelProtocol {
-    var updatePlayersModel: (([String: [PlayersModel]]) -> ())? { get set }
+    var updatePlayersModel: (([MainModel]) -> ())? { get set }
     func getPlayersData()
+    func viewDidLoad()
+    var setupInitial: (() -> Void)? { get set }
 }
 
 class MainViewModel: MainViewModelProtocol {
     
-    
-    var playersModel: PlayersModel?
-    
-    var playersModelArray = [PlayersModel]()
-    
-    ///словарь с отсартированными игроками внутри стран
-    var playersDictionary = [String: [PlayersModel]]() {
-        didSet {
-            updatePlayersModel?(playersDictionary)
-        }
+    func viewDidLoad() {
+        setupInitial?()
     }
+
     
-    var updatePlayersModel: (([String: [PlayersModel]]) -> ())?
+    var updatePlayersModel: (([MainModel]) -> ())?
     
     var networkService = NetworkService()
+    
+    var setupInitial: (() -> Void)?
     
     func getPlayersData() {
         networkService.getPlayers { [weak self] result in
             switch result {
-            case let .success(models):
-                for model in models {
-                    self?.playersModelArray.append(PlayersModel(country: model.player.country, name: model.player.name, age: model.player.age, level: model.playerInfo.level, score: model.playerInfo.score))
+            case let .success(model):
+                let groupedModel = Dictionary(grouping: model, by: { $0.player.country })
+                let model = groupedModel.map { country, players in
+                    let players = players.map { player in
+                        MainModel.Player(
+                            name: player.player.name,
+                            age: player.player.age,
+                            level: player.playerInfo.level,
+                            score: player.playerInfo.score
+                        )
+                    }.sorted { first, second in
+                        first.score > second.score
+                    }
+                    return MainModel(cuntry: country, players: players)
                 }
+                self?.updatePlayersModel?(model)
+                
             case .failure(.invalidateResponse):
                 print("Error invalidateResponse")
             }
         }
-        playersDictionary = dictionaryFillingAndSorting(models: playersModelArray)
-    }
-    
-    /// заполняем словарь с отсартированными игроками внутри стран
-    func dictionaryFillingAndSorting(models: [PlayersModel]) -> [String: [PlayersModel]] {
-        var dictionary = [String: [PlayersModel]]()
-        for model in models {
-            if dictionary[model.country] == nil {
-                dictionary[model.country] = [model]
-            } else {
-                dictionary[model.country]?.append(model)
-            }
-        }
-        let newDictionary = dictionary.mapValues { $0.sorted { $0.score > $1.score } }
-        
-        return newDictionary
     }
 }

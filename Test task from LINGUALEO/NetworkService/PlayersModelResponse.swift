@@ -17,15 +17,15 @@ struct PlayersModelResponseModel: Codable {
         case player
         case playerInfo = "player_info"
     }
-}
+    
+    struct Player: Codable {
+        let name: String
+        let country: String
+        let age: Int
+    }
 
-struct Player: Codable {
-    let name: String
-    let country: String
-    let age: Int
-}
-
-struct PlayerInfo: Codable {
-    let level: Int
-    let score: Int
+    struct PlayerInfo: Codable {
+        let level: Int
+        let score: Int
+    }
 }

@@ -11,20 +11,45 @@ class DetailedInformationViewController: UIViewController {
     
     //MARK: - Properties
     
+    var test = "test"
+    
+    var detailedViewModel: DetailedViewModelProtocol?
+//        didSet {
+//            detailedViewModel?.updatePlayersModel = { [weak self] player in
+//                self?.test = player?.name ?? "gog"
+//                print(self?.test)
+//                self?.view.setNeedsLayout()
+//            }
+//        }
+    
+    
+    
+    var detailedPlayer: MainModel?
+    
     private let backgroundImage: UIImageView = {
         let image = UIImage(named: "linguaLeo2")
         let imageView = UIImageView(image: image)
-        imageView.alpha = 0.8
+        //imageView.alpha = 0.8
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
+    private let viewFrame: UIView = {
+        let view = UIView()
+        view.backgroundColor = .white
+        view.alpha = 0.8
+        
+        view.layer.cornerRadius = 18
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
     private let name: UILabel = {
         let label = UILabel()
-        label.text = "Имя: Стасик"
+        //label.text = "Имя: Стасик"
         label.numberOfLines = 2
         label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 25)
+        label.font = UIFont.boldSystemFont(ofSize: 27)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -33,7 +58,7 @@ class DetailedInformationViewController: UIViewController {
         let label = UILabel()
         label.text = "Возраст: 30 лет"
         label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 25)
+        label.font = UIFont.boldSystemFont(ofSize: 27)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -43,7 +68,7 @@ class DetailedInformationViewController: UIViewController {
         label.text = "Город: Санкт-Петербург"
         label.numberOfLines = 2
         label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 25)
+        label.font = UIFont.boldSystemFont(ofSize: 27)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -53,7 +78,7 @@ class DetailedInformationViewController: UIViewController {
         label.text = "Уровень: 99"
         label.numberOfLines = 0
         label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 25)
+        label.font = UIFont.boldSystemFont(ofSize: 27)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -63,7 +88,7 @@ class DetailedInformationViewController: UIViewController {
         label.text = "Счет: 9999"
         label.numberOfLines = 0
         label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 25)
+        label.font = UIFont.boldSystemFont(ofSize: 27)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -72,7 +97,7 @@ class DetailedInformationViewController: UIViewController {
         let button = UIButton()
         button.setTitle("Удалить пользователя", for: .normal)
         button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .green
+        button.backgroundColor = .systemRed
         button.layer.borderWidth = 3
         button.layer.borderColor = UIColor.black.cgColor
         button.layer.cornerRadius = 10
@@ -82,6 +107,16 @@ class DetailedInformationViewController: UIViewController {
     
     
     //MARK: - Methods
+    
+    init(detailedViewModel: DetailedViewModelProtocol) {
+        self.detailedViewModel = detailedViewModel
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -93,17 +128,35 @@ class DetailedInformationViewController: UIViewController {
         setupElements()
         setupConstraints()
         title = "Детальная информация"
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+        bindingViewModel()
+        detailedViewModel?.viewDidLoad()
+        
+        //updateView()
+    }
+    
+    func bindingViewModel() {
+        detailedViewModel?.updatePlayersModel = { [weak self] model in
+            self?.name.text = "Имя: \(model.players.first?.name ?? "")"
+            self?.age.text = "Возраст: \(model.players.first?.age ?? 0)"
+            self?.country.text = "Город: \(model.cuntry)"
+            self?.lavel.text = "Уровень: \(model.players.first?.level ?? 0)"
+            self?.score.text = "Счет: \(model.players.first?.score ?? 0)"
+        }
+        
+    
     }
     
     private func setupElements() {
         view.addSubview(backgroundImage)
-        backgroundImage.addSubview(name)
-        backgroundImage.addSubview(age)
-        backgroundImage.addSubview(country)
+        view.addSubview(viewFrame)
+        viewFrame.addSubview(name)
+        viewFrame.addSubview(age)
+        viewFrame.addSubview(country)
         
-        backgroundImage.addSubview(buttonDelete)
-        backgroundImage.addSubview(score)
-        backgroundImage.addSubview(lavel)
+        viewFrame.addSubview(buttonDelete)
+        viewFrame.addSubview(score)
+        viewFrame.addSubview(lavel)
     }
     
     private func setupConstraints() {
@@ -113,7 +166,12 @@ class DetailedInformationViewController: UIViewController {
             backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            name.topAnchor.constraint(equalTo: backgroundImage.safeAreaLayoutGuide.topAnchor),
+            viewFrame.topAnchor.constraint(equalTo: view.topAnchor),
+            viewFrame.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            viewFrame.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            viewFrame.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            name.topAnchor.constraint(equalTo: backgroundImage.safeAreaLayoutGuide.topAnchor, constant: 25),
             name.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
             
             age.topAnchor.constraint(equalTo: name.bottomAnchor, constant: 20),
@@ -124,7 +182,9 @@ class DetailedInformationViewController: UIViewController {
             
             
             buttonDelete.bottomAnchor.constraint(equalTo: backgroundImage.safeAreaLayoutGuide.bottomAnchor),
-            buttonDelete.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
+            buttonDelete.leadingAnchor.constraint(equalTo: backgroundImage.leadingAnchor, constant: 50),
+            buttonDelete.trailingAnchor.constraint(equalTo: backgroundImage.trailingAnchor, constant: -50),
+            buttonDelete.heightAnchor.constraint(equalToConstant: 50),
             
             score.bottomAnchor.constraint(equalTo: buttonDelete.topAnchor, constant: -20),
             score.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
