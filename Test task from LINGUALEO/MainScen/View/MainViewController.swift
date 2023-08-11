@@ -7,42 +7,49 @@
 
 import UIKit
 
-class MainViewController: UIViewController {
+final class MainViewController: UIViewController {
+    
+    private enum Constants {
+        static let nameBackgroundImage = "MainLinguaLeo"
+        static let alphaBackgroundImage: CGFloat = 0.5
+        static let alphaTableView: CGFloat = 0.9
+    }
     
     //MARK: - Properties
+    private var viewModel: MainViewModelProtocol
     
     private var dataModel = [MainModel]()
     
     private let backgroundImage: UIImageView = {
-        let image = UIImage(named: "MainLinguaLeo")
+        let image = UIImage(named: Constants.nameBackgroundImage)
         let imageView = UIImageView(image: image)
-        imageView.alpha = 0.5
+        imageView.alpha = Constants.alphaBackgroundImage
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
-    private lazy var table: UITableView = {
-        let table = UITableView()
-        table.backgroundColor = .clear
-        table.alpha = 0.9
-        table.translatesAutoresizingMaskIntoConstraints = false
-        return table
+    private let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .clear
+        tableView.alpha = Constants.alphaTableView
+        tableView.register(CellForTable.self, forCellReuseIdentifier: CellForTable.identifier)
+        tableView.register(ViewForSectionTable.self, forHeaderFooterViewReuseIdentifier: ViewForSectionTable.identifier)
+        tableView.separatorStyle = .none
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        return tableView
     }()
     
-    private var viewModel: MainViewModelProtocol
-    
-    //MARK: - Methods
-    
+    //MARK: - Initializers
     init(viewModel: MainViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Lifecycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: false)
@@ -57,6 +64,7 @@ class MainViewController: UIViewController {
         viewModel.viewDidLoad()
     }
     
+    //MARK: - Methods
     private func bindingViewModel() {
         viewModel.setupInitial = { [weak self] in
             self?.setupElements()
@@ -66,14 +74,13 @@ class MainViewController: UIViewController {
         
         viewModel.updatePlayersModel = { [weak self] model in
             self?.dataModel = model
-            self?.table.reloadData()
+            self?.tableView.reloadData()
         }
     }
     
     private func setupElements() {
         view.addSubview(backgroundImage)
-        view.addSubview(table)
-        
+        view.addSubview(tableView)
     }
     
     private func setupConstraints() {
@@ -83,24 +90,20 @@ class MainViewController: UIViewController {
             backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            table.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            table.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            table.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            table.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
     
     private func setupTable() {
-        table.delegate = self
-        table.dataSource = self
-        table.register(CellForTable.self, forCellReuseIdentifier: CellForTable.identifier)
-        table.register(ViewForSectionTable.self, forHeaderFooterViewReuseIdentifier: ViewForSectionTable.identifier)
-        table.separatorStyle = .none
+        tableView.delegate = self
+        tableView.dataSource = self
     }
 }
 
 //MARK: - extension - UITableViewDataSource
-
 extension MainViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -122,6 +125,7 @@ extension MainViewController: UITableViewDataSource {
     }
 }
 
+//MARK: - extension - UITableViewDelegate
 extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = tableView.dequeueReusableHeaderFooterView(withIdentifier: ViewForSectionTable.identifier) as? ViewForSectionTable
@@ -132,21 +136,32 @@ extension MainViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let detailViewModel = DetailedViewModel(playersModel: MainModel(cuntry: dataModel[indexPath.section].cuntry, players: [dataModel[indexPath.section].players[indexPath.row]]), section: indexPath.section, index: indexPath.row)
+        let cuntry = dataModel[indexPath.section].cuntry
+        let player = dataModel[indexPath.section].players[indexPath.row]
+        
+        let detailViewModel = DetailedViewModel(
+            playersModel: DetailModel(
+                cuntry: cuntry,
+                name: player.name,
+                age: player.age,
+                level: player.level,
+                score: player.score,
+                indexPath: indexPath
+            )
+        )
+        
         let controller = DetailedInformationViewController(detailedViewModel: detailViewModel)
         
-        controller.completionDelete = { [weak self] section, index in
-            self?.dataModel[section].players.remove(at: index)
-            self?.table.reloadData()
+        detailViewModel.delete = { [weak self] indexPath in
+            guard let self else { return }
+            controller.navigationController?.popViewController(animated: true)
+            self.dataModel[indexPath.section].players.remove(at: indexPath.row)
             
-            guard let isEmpty = self?.dataModel[section].players.isEmpty else {
-                return
+            if self.dataModel[indexPath.section].players.isEmpty  {
+                self.dataModel.remove(at: indexPath.section)
             }
             
-            if isEmpty  {
-                self?.dataModel.remove(at: section)
-                self?.table.reloadData()
-            }
+            self.tableView.reloadData()
         }
         
         navigationController?.pushViewController(controller, animated: true)

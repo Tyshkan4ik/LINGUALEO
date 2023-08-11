@@ -7,94 +7,102 @@
 
 import UIKit
 
-class DetailedInformationViewController: UIViewController {
+final class DetailedInformationViewController: UIViewController {
+    
+    private enum Constants {
+        static let nameBackgroundImage = "linguaLeo2"
+        static let alphaContainerView: CGFloat = 0.8
+        static let fontSize: CGFloat = 27
+        static let borderWidthButton: CGFloat = 3
+        static let cornerRadiusButton: CGFloat = 10
+        static let titleButton = "Удалить пользователя"
+        static let navigationBarTitle = "Детальная информация"
+        static let nameString = "Имя:"
+        static let ageString = "Возраст:"
+        static let countryString = "Страна:"
+        static let lavelString = "Уровень:"
+        static let scoreString = "Очки:"
+        static let nameLabelTopConstant: CGFloat = 25
+        static let topAndBottomConstant: CGFloat = 20
+        static let buttonDeleteConstant: CGFloat = 50
+    }
     
     //MARK: - Properties
-    
     private var detailedViewModel: DetailedViewModelProtocol?
     
-    var completionDelete: ((_ section: Int, _ index: Int) -> Void)?
-    
-    private var detailedPlayer: MainModel?
-    
     private let backgroundImage: UIImageView = {
-        let image = UIImage(named: "linguaLeo2")
+        let image = UIImage(named: Constants.nameBackgroundImage)
         let imageView = UIImageView(image: image)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
     
-    private let viewFrame: UIView = {
+    private let containerView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
-        view.alpha = 0.8
+        view.alpha = Constants.alphaContainerView
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
     
-    private let name: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 2
-        label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 27)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let age: UILabel = {
-        let label = UILabel()
-        label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 27)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let country: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 2
-        label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 27)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let lavel: UILabel = {
+    private let nameLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 27)
+        label.font = UIFont.boldSystemFont(ofSize: Constants.fontSize)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
-    private let score: UILabel = {
+    private let ageLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = UIFont.boldSystemFont(ofSize: Constants.fontSize)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let countryLabel: UILabel = {
         let label = UILabel()
         label.numberOfLines = 0
         label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 27)
+        label.font = UIFont.boldSystemFont(ofSize: Constants.fontSize)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let lavelLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = UIFont.boldSystemFont(ofSize: Constants.fontSize)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let scoreLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = UIFont.boldSystemFont(ofSize: Constants.fontSize)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private lazy var buttonDelete: UIButton = {
         let button = UIButton()
-        button.setTitle("Удалить пользователя", for: .normal)
+        button.setTitle(Constants.titleButton, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.backgroundColor = .systemRed
-        button.layer.borderWidth = 3
+        button.layer.borderWidth = Constants.borderWidthButton
         button.layer.borderColor = UIColor.black.cgColor
-        button.layer.cornerRadius = 10
+        button.layer.cornerRadius = Constants.cornerRadiusButton
         button.addTarget(self, action: #selector(deletePeople), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
     
-    
-    //MARK: - Methods
-    
+    //MARK: - Initializers
     init(detailedViewModel: DetailedViewModelProtocol) {
         self.detailedViewModel = detailedViewModel
-        
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -102,6 +110,7 @@ class DetailedInformationViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Lifecycle
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: false)
@@ -109,35 +118,38 @@ class DetailedInformationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupElements()
-        setupConstraints()
-        title = "Детальная информация"
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
+        setupNavigationBar()
         bindingViewModel()
         detailedViewModel?.viewDidLoad()
         
     }
     
+    //MARK: - Methods
     private func bindingViewModel() {
+        detailedViewModel?.setupInitial = { [weak self] in
+            self?.setupElements()
+            self?.setupConstraints()
+        }
+        
         detailedViewModel?.updatePlayersModel = { [weak self] model in
-            self?.name.text = "Имя: \(model.players.first?.name ?? "")"
-            self?.age.text = "Возраст: \(model.players.first?.age ?? 0)"
-            self?.country.text = "Город: \(model.cuntry)"
-            self?.lavel.text = "Уровень: \(model.players.first?.level ?? 0)"
-            self?.score.text = "Счет: \(model.players.first?.score ?? 0)"
+            self?.nameLabel.text = "\(Constants.nameString) \(model.name)"
+            self?.ageLabel.text = "\(Constants.ageString) \(model.age)"
+            self?.countryLabel.text = "\(Constants.countryString) \(model.cuntry)"
+            self?.lavelLabel.text = "\(Constants.lavelString) \(model.level)"
+            self?.scoreLabel.text = "\(Constants.scoreString) \(model.score)"
         }
     }
     
     private func setupElements() {
         view.addSubview(backgroundImage)
-        view.addSubview(viewFrame)
-        viewFrame.addSubview(name)
-        viewFrame.addSubview(age)
-        viewFrame.addSubview(country)
+        view.addSubview(containerView)
+        containerView.addSubview(nameLabel)
+        containerView.addSubview(ageLabel)
+        containerView.addSubview(countryLabel)
         
-        viewFrame.addSubview(buttonDelete)
-        viewFrame.addSubview(score)
-        viewFrame.addSubview(lavel)
+        containerView.addSubview(buttonDelete)
+        containerView.addSubview(scoreLabel)
+        containerView.addSubview(lavelLabel)
     }
     
     private func setupConstraints() {
@@ -147,45 +159,40 @@ class DetailedInformationViewController: UIViewController {
             backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            viewFrame.topAnchor.constraint(equalTo: view.topAnchor),
-            viewFrame.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            viewFrame.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            viewFrame.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            containerView.topAnchor.constraint(equalTo: view.topAnchor),
+            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             
-            name.topAnchor.constraint(equalTo: backgroundImage.safeAreaLayoutGuide.topAnchor, constant: 25),
-            name.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
+            nameLabel.topAnchor.constraint(equalTo: backgroundImage.safeAreaLayoutGuide.topAnchor, constant: Constants.nameLabelTopConstant),
+            nameLabel.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
             
-            age.topAnchor.constraint(equalTo: name.bottomAnchor, constant: 20),
-            age.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
+            ageLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: Constants.topAndBottomConstant),
+            ageLabel.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
             
-            country.topAnchor.constraint(equalTo: age.bottomAnchor, constant: 20),
-            country.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
+            countryLabel.topAnchor.constraint(equalTo: ageLabel.bottomAnchor, constant: Constants.topAndBottomConstant),
+            countryLabel.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
             
             buttonDelete.bottomAnchor.constraint(equalTo: backgroundImage.safeAreaLayoutGuide.bottomAnchor),
-            buttonDelete.leadingAnchor.constraint(equalTo: backgroundImage.leadingAnchor, constant: 50),
-            buttonDelete.trailingAnchor.constraint(equalTo: backgroundImage.trailingAnchor, constant: -50),
-            buttonDelete.heightAnchor.constraint(equalToConstant: 50),
+            buttonDelete.leadingAnchor.constraint(equalTo: backgroundImage.leadingAnchor, constant: Constants.buttonDeleteConstant),
+            buttonDelete.trailingAnchor.constraint(equalTo: backgroundImage.trailingAnchor, constant: -Constants.buttonDeleteConstant),
+            buttonDelete.heightAnchor.constraint(equalToConstant: Constants.buttonDeleteConstant),
             
-            score.bottomAnchor.constraint(equalTo: buttonDelete.topAnchor, constant: -20),
-            score.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
+            scoreLabel.bottomAnchor.constraint(equalTo: buttonDelete.topAnchor, constant: -Constants.topAndBottomConstant),
+            scoreLabel.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
             
-            lavel.bottomAnchor.constraint(equalTo: score.topAnchor, constant: -20),
-            lavel.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
+            lavelLabel.bottomAnchor.constraint(equalTo: scoreLabel.topAnchor, constant: -Constants.topAndBottomConstant),
+            lavelLabel.centerXAnchor.constraint(equalTo: backgroundImage.centerXAnchor),
         ])
+    }
+    
+    private func setupNavigationBar() {
+        title = Constants.navigationBarTitle
+        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.black]
     }
     
     @objc
     private func deletePeople() {
-        var sectionsDelete: Int = 0
-        var indexDelete: Int = 0
-        detailedViewModel?.delete = { section, index in
-            sectionsDelete = section
-            indexDelete = index
-        }
-        detailedViewModel?.deletePeople()
-        
-        completionDelete?(sectionsDelete, indexDelete)
-        
-        navigationController?.popViewController(animated: true)
+        detailedViewModel?.deletePlayer()
     }
 }

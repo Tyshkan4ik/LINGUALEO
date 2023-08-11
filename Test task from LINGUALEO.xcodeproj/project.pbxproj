@@ -21,6 +21,7 @@
 		81C511F22A85945200AB3BBD /* ViewForSectionTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C511F12A85945200AB3BBD /* ViewForSectionTable.swift */; };
 		81C511F42A85A20F00AB3BBD /* DetailedInformationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C511F32A85A20F00AB3BBD /* DetailedInformationViewController.swift */; };
 		81C511F62A861AF300AB3BBD /* DetailedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C511F52A861AF300AB3BBD /* DetailedViewModel.swift */; };
+		81C511F82A86BECA00AB3BBD /* DetailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C511F72A86BECA00AB3BBD /* DetailModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		81C511F12A85945200AB3BBD /* ViewForSectionTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewForSectionTable.swift; sourceTree = "<group>"; };
 		81C511F32A85A20F00AB3BBD /* DetailedInformationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedInformationViewController.swift; sourceTree = "<group>"; };
 		81C511F52A861AF300AB3BBD /* DetailedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedViewModel.swift; sourceTree = "<group>"; };
+		81C511F72A86BECA00AB3BBD /* DetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -117,6 +119,7 @@
 			isa = PBXGroup;
 			children = (
 				81C511E32A84FA5200AB3BBD /* MainModel.swift */,
+				81C511F72A86BECA00AB3BBD /* DetailModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -234,6 +237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81C511F82A86BECA00AB3BBD /* DetailModel.swift in Sources */,
 				81C511F22A85945200AB3BBD /* ViewForSectionTable.swift in Sources */,
 				81C511EC2A850F7D00AB3BBD /* PlayersModelResponse.swift in Sources */,
 				81C511CD2A84DCCA00AB3BBD /* MainViewController.swift in Sources */,

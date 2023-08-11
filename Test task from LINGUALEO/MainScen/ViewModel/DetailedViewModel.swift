@@ -8,43 +8,42 @@
 import Foundation
 
 protocol DetailedViewModelProtocol {
-    var updatePlayersModel: ((MainModel) -> ())? { get set }
-    var playerModel: MainModel { get set }
-    func viewDidLoad()
+    /// Обновляем данные пользователя
+    var updatePlayersModel: ((DetailModel) -> ())? { get set }
+    /// Модель пользователей
+    var playerModel: DetailModel { get set }
+    /// Передаем удаляемого пользователя
+    var delete: ((IndexPath) -> ())? { get set }
     
-    var delete: ((_ section: Int, _ index: Int) -> ())? { get set }
-    func deletePeople()
+    /// Удаляем пользователя из списка
+    func deletePlayer()
+    /// Начальная настрока View
+    func viewDidLoad()
+    /// Начальная настрока View
+    var setupInitial: (() -> Void)? { get set }
 }
 
-class DetailedViewModel: DetailedViewModelProtocol {
+final class DetailedViewModel: DetailedViewModelProtocol {
     
     //MARK: - Properties
+    var playerModel: DetailModel
     
-    var updatePlayersModel: ((MainModel) -> ())?
-    
-    var delete: ((_ section: Int, _ index: Int) -> ())?
-    
-    private let section: Int
-    
-    private let index: Int
-    
-    var playerModel: MainModel
+    var updatePlayersModel: ((DetailModel) -> ())?
+    var delete: ((IndexPath) -> ())?
+    var setupInitial: (() -> Void)?
     
     //MARK: - Initializers
-    
-    init(playersModel: MainModel, section: Int, index: Int) {
+    init(playersModel: DetailModel) {
         self.playerModel = playersModel
-        self.section = section
-        self.index = index
     }
     
     //MARK: - Methods
-    
     func viewDidLoad() {
+        setupInitial?()
         updatePlayersModel?(playerModel)
     }
     
-    func deletePeople() {
-        delete?(section, index)
+    func deletePlayer() {
+        delete?(playerModel.indexPath)
     }
 }

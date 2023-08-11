@@ -8,24 +8,25 @@
 import Foundation
 
 protocol MainViewModelProtocol {
+    /// Обновляем список пользователей во View
     var updatePlayersModel: (([MainModel]) -> ())? { get set }
+    /// Получить данные пользователей
     func getPlayersData()
+    /// View  загрузилась
     func viewDidLoad()
+    /// Начальная настрока View
     var setupInitial: (() -> Void)? { get set }
 }
 
-class MainViewModel: MainViewModelProtocol {
+final class MainViewModel: MainViewModelProtocol {
     
     //MARK: - Properties
-
-    var updatePlayersModel: (([MainModel]) -> ())?
-    
     private var networkService = NetworkService()
     
+    var updatePlayersModel: (([MainModel]) -> ())?
     var setupInitial: (() -> Void)?
     
     //MARK: - Methods
-    
     func viewDidLoad() {
         setupInitial?()
     }
