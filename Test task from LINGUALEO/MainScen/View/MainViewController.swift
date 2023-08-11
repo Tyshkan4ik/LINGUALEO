@@ -13,9 +13,18 @@ class MainViewController: UIViewController {
     
     var playersDictionary = [String: [PlayersModel]]()
     
+    private let backgroundImage: UIImageView = {
+        let image = UIImage(named: "MainLinguaLeo")
+        let imageView = UIImageView(image: image)
+        imageView.alpha = 0.5
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
     private lazy var table: UITableView = {
        let table = UITableView()
         table.backgroundColor = .clear
+        table.alpha = 0.9
         table.translatesAutoresizingMaskIntoConstraints = false
         return table
     }()
@@ -30,6 +39,11 @@ class MainViewController: UIViewController {
     }
     
     //MARK: - Methods
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,11 +58,17 @@ class MainViewController: UIViewController {
     }
     
     private func setupElements() {
+        view.addSubview(backgroundImage)
         view.addSubview(table)
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
+            backgroundImage.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundImage.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundImage.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backgroundImage.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
             table.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             table.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             table.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -106,5 +126,10 @@ extension MainViewController: UITableViewDelegate {
         
         reuseSection.setup(model: key)
                return reuseSection
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let controller = DetailedInformationViewController()
+        navigationController?.pushViewController(controller, animated: true)
     }
 }

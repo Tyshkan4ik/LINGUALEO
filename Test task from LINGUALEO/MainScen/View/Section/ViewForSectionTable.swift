@@ -17,7 +17,7 @@ class ViewForSectionTable: UITableViewHeaderFooterView {
     
     private let sectionFrame: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue
+        //view.backgroundColor = .systemBlue
         view.alpha = 0.95
         
         view.layer.cornerRadius = 18
@@ -41,7 +41,8 @@ class ViewForSectionTable: UITableViewHeaderFooterView {
         super.init(reuseIdentifier: reuseIdentifier)
         setupSubview()
         setupConstraints()
-        backgroundColor = .clear
+        //backgroundColor = .clear
+        
     }
     
     required init?(coder: NSCoder) {
