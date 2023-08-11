@@ -32,7 +32,7 @@ class MainViewModel: MainViewModelProtocol {
             switch result {
             case let .success(model):
                 let groupedModel = Dictionary(grouping: model, by: { $0.player.country })
-                let model = groupedModel.map { country, players in
+                var model = groupedModel.map { country, players in
                     let players = players.map { player in
                         MainModel.Player(
                             name: player.player.name,
@@ -44,6 +44,9 @@ class MainViewModel: MainViewModelProtocol {
                         first.score > second.score
                     }
                     return MainModel(cuntry: country, players: players)
+                }
+                model.sort { first, second in
+                    first.cuntry < second.cuntry
                 }
                 self?.updatePlayersModel?(model)
                 
